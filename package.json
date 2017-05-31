@@ -1,0 +1,22 @@
+{
+  "name": "chat_server",
+  "version": "1.0.0",
+  "description": "This is the back-end of a chat server for \"Lenguajes de Programacion\" course in Unitec. Q2 2017",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Unitec-Segebre/LenguajesDeProgramacion_Proyecto1.git"
+  },
+  "author": "Juan Enrique Segebre",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Unitec-Segebre/LenguajesDeProgramacion_Proyecto1/issues"
+  },
+  "homepage": "https://github.com/Unitec-Segebre/LenguajesDeProgramacion_Proyecto1#readme",
+  "dependencies": {
+    "mongoose": "^4.10.4"
+  }
+}
