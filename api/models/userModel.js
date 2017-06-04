@@ -1,8 +1,7 @@
-'use strict';
+'use strict'; ///validate with json Schema and middleware
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 
-var userSchema = new Schema({
+var UserSchema = new mongoose.Schema({
     "username": {
         type: String,
         required: [true, 'Please select a username']
@@ -20,11 +19,22 @@ var userSchema = new Schema({
         required: false
     },
     "email": {
-        type: mongoose.SchemaTypes.Email,
+        type: String,
+        lowercase: true,
         required: true
     },
     "loginAttemptCount": {
         type: Number,
         default: 0
-    }
+    },
+    "isActive": {
+        type: Boolean,
+        default: true
+    },
+    "friends": [{
+        type:  mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
+
+module.exports = mongoose.model('Users', UserSchema);
