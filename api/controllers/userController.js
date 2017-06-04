@@ -19,3 +19,30 @@ exports.create_user = function(req, res) {
     res.json(user);
   });
 };
+
+exports.login = function (req, res) {
+    User.findOne({username: req.body.username}, function (err, user) {
+        if(err)
+          res.send(err);
+
+        if(user.loginAttemptCount >= 5){
+          //Send Mailer
+        }else{
+          if(req.body.password === user.password){
+            user.loginAttemptCount = 0;
+              user.save(function(err, user) {
+                if (err)
+                  res.send(err);
+                res.json(user);
+              });
+          }else {
+            user.loginAttemptCount++;
+            user.save(function(err, user) {
+              if (err)
+                res.send(err);
+              res.send("Wrong Password!")
+            });
+          }
+        }
+    })
+};

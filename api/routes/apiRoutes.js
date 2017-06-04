@@ -5,5 +5,8 @@ module.exports = function(app) {
   app.route('/users')
     .get(user.list_all_users)
     .post(user.create_user);
+
+  app.route('/login')
+      .post(user.login);
     
 };
