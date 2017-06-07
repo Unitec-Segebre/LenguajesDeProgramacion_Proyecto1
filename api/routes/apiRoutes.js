@@ -7,6 +7,9 @@ module.exports = function(app) {
   app.route('/login')
       .post(user.login);
 
+  app.route('/users')
+      .post(user.create_user);
+
   //Add specific permisions per token
   app.use(function (req, res, next) {
       var token = req.body.token || req.query.token || req.headers['chat-access-token'];
@@ -31,7 +34,6 @@ module.exports = function(app) {
   });
 
   app.route('/users')
-    .get(user.list_all_users)
-    .post(user.create_user);
+    .get(user.list_all_users);
     
 };
