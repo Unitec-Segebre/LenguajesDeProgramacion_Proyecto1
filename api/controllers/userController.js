@@ -36,49 +36,42 @@ exports.login = function (req, res) {
             message: "Authentication failed: User not found."
         });
       }else if(user){
-        if(user.password !== req.body.password){
-          res.json({
-              success: false,
-              message: "Authentication failed: Wrong Password."
-          });
-        }else{
-          var token = jwt.sign(user, app.get('superSecret'),{
-            expiresIn: 60*60*24
-          });
+          if(user.loginAttemptCount >= 5) {
+              //Send Mailer
+              res.json({
+                  success: false,
+                  message: "Authentication failed: Max attempts reached."
+              });
+          }else{
+              if(user.password !== req.body.password){
+                  user.loginAttemptCount += 1;
+                  user.save(function(err, user) {
+                      if (err)
+                          res.send(err);
+                  });
 
-          res.json({
-              success: true,
-              message: "Enjoy your Token!",
-              token: token
-          });
-        }
+                  res.json({
+                      success: false,
+                      message: "Authentication failed: Wrong Password."
+                  });
+              }else{
+                  user.loginAttemptCount = 0;
+                  user.save(function(err, user) {
+                    if (err)
+                      res.send(err);
+                  });
+
+                  var token = jwt.sign(user, app.get('superSecret'),{
+                      expiresIn: 60*60*24
+                  });
+
+                  res.json({
+                      success: true,
+                      message: "Enjoy your Token!",
+                      token: token
+                  });
+              }
+          }
       }
   });
-
-
-
-    // User.findOne({username: req.body.username}, function (err, user) {
-    //     if(err)
-    //       res.send(err);
-    //
-    //     if(user.loginAttemptCount >= 5){
-    //       //Send Mailer
-    //     }else{
-    //       if(req.body.password === user.password){
-    //         user.loginAttemptCount = 0;
-    //           user.save(function(err, user) {
-    //             if (err)
-    //               res.send(err);
-    //             res.json(user);
-    //           });
-    //       }else {
-    //         user.loginAttemptCount++;
-    //         user.save(function(err, user) {
-    //           if (err)
-    //             res.send(err);
-    //           res.send("Wrong Password!")
-    //         });
-    //       }
-    //     }
-    // })
 };
