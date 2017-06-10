@@ -1,10 +1,12 @@
-//Scan project to replace var with let and delete unused variables
-//Add bcrypt from: http://blog.slatepeak.com/refactoring-a-basic-authenticated-api-with-node-express-and-mongo/
+//validate with json Schema and middleware
+//add timestamp and relations as in: http://blog.slatepeak.com/creating-a-real-time-chat-api-with-node-express-socket-io-and-mongodb/
+'use strict';
 var express = require('express'),
     app = module.exports = express(),
     port = process.env.PORT || 3000,
     mongoose = require('mongoose'),
     User = require('./api/models/userModel'),
+    Message = require('./api/models/messageModel'),
     bodyParser = require('body-parser'),
     morgan = require('morgan'),
     jwt = require('jsonwebtoken'),
