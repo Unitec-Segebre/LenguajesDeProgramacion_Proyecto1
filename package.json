@@ -4,7 +4,8 @@
   "description": "This is the back-end of a chat server for \"Lenguajes de Programacion\" course in Unitec. Q2 2017",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -16,7 +17,14 @@
     "url": "https://github.com/Unitec-Segebre/LenguajesDeProgramacion_Proyecto1/issues"
   },
   "homepage": "https://github.com/Unitec-Segebre/LenguajesDeProgramacion_Proyecto1#readme",
+  "devDependencies": {
+    "nodemon": "^1.11.0",
+    "morgan": "^1.8.2"
+  },
   "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "jsonwebtoken": "^7.4.1",
     "mongoose": "^4.10.4"
   }
 }
