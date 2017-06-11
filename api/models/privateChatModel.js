@@ -6,11 +6,12 @@ var PrivateChatSchema = new Schema({
     otherUser:{
         type: Schema.Types.ObjectId,
         ref: 'Users'
-    },
-    Messages:[{
+    }
+    /*Messages:[{
         type: Schema.Types.ObjectId,
         ref: 'Messages'
     }]
+    participants: [{ type: Schema.Types.ObjectId, ref: 'Users'}]*/
 });
 
 module.exports = mongoose.model('PrivateChats', PrivateChatSchema);
