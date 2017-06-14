@@ -36,8 +36,12 @@ module.exports = function(app) {
   app.route('/users')
     .get(user.list_all_users);
 
-  app.route('/:_id/friends')
+  app.route('/users/:_id/friends')
       .get(user.list_friends)
       .post(user.add_friend);
+
+  app.route('/users/:_id/rooms')
+      //.get(user.list_rooms)
+      .post(user.add_room);
     
 };

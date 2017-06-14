@@ -8,15 +8,15 @@ var RoomSchema = new mongoose.Schema({
     },
     "owner": {
         type: mongoose.Schema.ObjectId,
-        ref: 'Users' //Check if is User instead of Users
+        ref: 'Users'
     },
     "messages": [{
        type: String // WARNING must add reference to messageModel
     }],
     "members": [{
         type: mongoose.Schema.ObjectId,
-        ref: 'Users' //Check if is User instead of Users
+        ref: 'Users'
     }]
 });
 
-mongoose.exports = mongoose.model('Rooms', RoomSchema);
+module.exports = mongoose.model('Rooms', RoomSchema);

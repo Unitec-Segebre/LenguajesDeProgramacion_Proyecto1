@@ -4,7 +4,8 @@
 var mongoose = require('mongoose'),
     jwt = require('jsonwebtoken'),
     app = require('../../server'),
-    User = mongoose.model('Users');
+    User = mongoose.model('Users'),
+    Room = mongoose.model('Rooms');
 
 exports.list_all_users = function(req, res) {
   User.find({}, function(err, user) {
@@ -129,5 +130,33 @@ exports.list_friends = function (req, res) {
         if(err)
             return res.send(err);
         res.json(user);
+    });
+};
+
+exports.add_room = function (req, res) {
+    User.findOne({
+        _id: req.params._id
+    }, function (err, user) {
+        if(err)
+            res.send(err);
+
+        var room = new Room({
+            name: req.body.name,
+            owner: user
+        });
+        room.save(function (err, newRoom) {
+            if(err)
+                res.send(err);
+            user.rooms.push(newRoom);
+            user.save(function (err) {
+                if(err)
+                    return res.send(err);
+
+                res.send({
+                    success: true,
+                    message: "New chat room added!"
+                });
+            });
+        });
     });
 };
