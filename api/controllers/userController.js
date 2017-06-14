@@ -97,7 +97,7 @@ exports.add_friend = function (req, res) {
                 _id: req.body._id
             }, function (err, friend) {
                 if (err)
-                    res.send(err); //add return?
+                    return res.send(err);
 
                 if(friend) {
                     user.friends.push(friend);
@@ -117,8 +117,7 @@ exports.add_friend = function (req, res) {
                     });
             })
         }else
-            res.send({"ERR": "Couldnt find user with id", "ID": req.params._id})
-        console.log("ID: " + req.params._id)
+            res.send({"ERR": "Couldnt find user with id", "ID": req.params._id}) //change response
     })
 };
 
