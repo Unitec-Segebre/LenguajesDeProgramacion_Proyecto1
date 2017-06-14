@@ -35,5 +35,9 @@ module.exports = function(app) {
 
   app.route('/users')
     .get(user.list_all_users);
+
+  app.route('/friends/:_id')
+      .get(user.list_friends)
+      .post(user.add_friend);
     
 };

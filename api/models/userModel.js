@@ -38,6 +38,10 @@ var UserSchema = new mongoose.Schema({
     "friends": [{
         type:  mongoose.Schema.Types.ObjectId,
         ref: 'Users'
+    }],
+    "rooms": [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Rooms'
     }]
 });
 
