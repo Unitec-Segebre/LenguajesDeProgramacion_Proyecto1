@@ -1,6 +1,7 @@
 'use strict';
 module.exports = function(app) {
   var user = require('../controllers/userController'),
+      room = require('../controllers/roomController'),
       app = require('../../server'),
       jwt = require('jsonwebtoken');
 
@@ -41,7 +42,12 @@ module.exports = function(app) {
       .post(user.add_friend);
 
   app.route('/users/:_id/rooms')
-      //.get(user.list_rooms)
-      .post(user.add_room);
+      .get(room.list_rooms)
+      .post(room.add_room);
+
+  app.route('/rooms/:_id/users')
+      .get(room.list_members)
+      .post(room.add_member)
+      .delete(room.remove_member);
     
 };
