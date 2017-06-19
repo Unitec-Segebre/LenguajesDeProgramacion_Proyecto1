@@ -1,14 +1,11 @@
-'use strict';
+//Scan project to replace var with let and delete unused variables
+//Add bcrypt from: http://blog.slatepeak.com/refactoring-a-basic-authenticated-api-with-node-express-and-mongo/
 var express = require('express'),
     app = module.exports = express(),
     port = process.env.PORT || 3000,
     mongoose = require('mongoose'),
     User = require('./api/models/userModel'),
-<<<<<<< HEAD
-    Message = require('./api/models/messageModel'),
-=======
     Room = require('./api/models/roomModel'),
->>>>>>> master
     bodyParser = require('body-parser'),
     morgan = require('morgan'),
     jwt = require('jsonwebtoken'),

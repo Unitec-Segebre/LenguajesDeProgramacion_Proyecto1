@@ -1,10 +1,10 @@
 'use strict';
+
 var nodemailer = require('nodemailer'),
-    jwt = require('jsonwebtoken'),
-    config = require('/Users/Francis/Desktop/LenguajesDeProgramacion_Proyecto1/config.js'); //change this later
+    config = require('/Users/Francis/Desktop/LenguajesDeProgramacion_Proyecto/config.js');
 
 var transporter;
-var rand = Math.floor((Math.random() * 100) + 54);
+//var rand = Math.floor((Math.random() * 100) + 54);
 
 exports.sendConfirmationEmail = function (token, req, res) {
     var host = req.get('host');
@@ -14,15 +14,15 @@ exports.sendConfirmationEmail = function (token, req, res) {
     var smtpConfig;  //has to vary according to service (google, outlook or yahoo)
 
     if (emailStuff.indexOf("gmail") != -1) {
-         smtpConfig = {
+        smtpConfig = {
             host: 'smtp.gmail.com',
-            secure: false, 
+            secure: false,
             auth: {
                 user: "overchats@gmail.com",
                 pass: config.overPass
             }
         };
-    }else{
+    } else {
         console.log("Please use gmail.");
     }
 
@@ -47,27 +47,3 @@ exports.sendConfirmationEmail = function (token, req, res) {
     });
 
 };
-
-// FUNCTION TO CONFIRM EMAIL: MUST FIX AND ADD MORE STUFF REGARDING LOGIN ACCESS
-
-exports.confirmProcess = function (req, res) {
-    var host = req.get('host');
-    console.log(req.protocol + ":/" + req.get('host'));
-    if ((req.protocol + "://" + req.get('host')) == ("http://" + host)) {
-        console.log("DOMAIN MATCHED.");
-        if (req.query.id == rand) {
-            console.log("EMAIL HAS BEEN VERIFIED!");
-            res.end("<h1>Your email " + mailOptions.to + " has been successfully verified!");
-            res.send({ "Email": "Confirmed!" });
-        }
-        else {
-            console.log("EMAIL HAS NOT BEEN VERIFIED.");
-            res.end("<h1>Bad Request</h1>");
-            res.send({ "Email": "Not Confirmed!" });
-        }
-    }
-    else {
-        res.end("<h1>Request is from unknown source</h1>");
-    }
-}
-

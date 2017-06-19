@@ -1,4 +1,4 @@
 module.exports = {
     "secret": "HolaIngenieroInge",
-    "overPass":"lenguajes14"
+    "overPass": "overchats14"
 };
