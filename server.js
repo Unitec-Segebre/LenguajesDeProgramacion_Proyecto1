@@ -4,7 +4,11 @@ var express = require('express'),
     port = process.env.PORT || 3000,
     mongoose = require('mongoose'),
     User = require('./api/models/userModel'),
+<<<<<<< HEAD
     Message = require('./api/models/messageModel'),
+=======
+    Room = require('./api/models/roomModel'),
+>>>>>>> master
     bodyParser = require('body-parser'),
     morgan = require('morgan'),
     jwt = require('jsonwebtoken'),
