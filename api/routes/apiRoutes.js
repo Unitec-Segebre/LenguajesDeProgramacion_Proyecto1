@@ -47,6 +47,9 @@ module.exports = function (app) {
         .get(room.list_rooms)
         .post(room.add_room);
 
+    app.route('/rooms')
+        .get(room.list_all_rooms);
+
     app.route('/rooms/:_id/users')
         .get(room.list_members)
         .post(room.add_member)

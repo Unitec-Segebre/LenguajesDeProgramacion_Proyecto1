@@ -57,6 +57,14 @@ exports.list_rooms = function (req, res) { //check if user is null
     });
 };
 
+exports.list_all_rooms = function (req, res) {
+    Room.find({}, function (err, rm) {
+        if (err)
+            res.send(err);
+        res.json(rm);
+    });
+};
+
 exports.remove_member = function (req, res) { //Validacion de ser el dueño en frontend? Osea no dar opcion a menos que sea el dueño
     User.update(                                //Actualmente no revisa si existe el usuario o el room
         {_id: req.body._id},
