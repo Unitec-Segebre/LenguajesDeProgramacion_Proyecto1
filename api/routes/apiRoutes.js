@@ -52,6 +52,10 @@ module.exports = function (app) {
         .post(room.add_member)
         .delete(room.remove_member);
 
+    app.route('/rooms/:_id/messages')
+        .get(room.get_specific_room)
+        .post(room.send_message);
+
     app.route('/privatechats')  
         .get(privatechat.list_chats);
     
@@ -65,8 +69,7 @@ module.exports = function (app) {
         .delete(privatechat.delete_chat);
     
     app.route('/messages')
-        .get(message.list_messages)
-        .post(message.write_a_mssg);
+        .get(message.list_messages);
 /*
     app.route('/privatechats')
         .get(privatechat.get_all_chats);

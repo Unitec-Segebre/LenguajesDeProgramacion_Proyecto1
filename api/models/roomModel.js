@@ -11,7 +11,8 @@ var RoomSchema = new mongoose.Schema({
         ref: 'Users'
     },
     "messages": [{
-       type: String // WARNING must add reference to messageModel
+       type: mongoose.Schema.Types.ObjectId,
+       ref: 'Messages'
     }],
     "members": [{
         type: mongoose.Schema.ObjectId,

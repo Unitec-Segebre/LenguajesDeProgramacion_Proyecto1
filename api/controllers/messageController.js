@@ -14,12 +14,3 @@ exports.list_messages = function (req, res) {
         res.json(cht);
     });
 };
-
-exports.write_a_mssg = function (req, res) {
-    var new_Mssg = new Message(req.body);
-    new_Mssg.save(function (err, cht) {
-        if (err)
-            res.send(err);
-        res.json(cht);
-    })
-};

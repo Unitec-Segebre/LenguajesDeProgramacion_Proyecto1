@@ -4,8 +4,13 @@ var mongoose = require('mongoose');
 
 var MessageSchema = new mongoose.Schema({
     chatId:{
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PrivateChats'
        // required: true
+    },
+    roomId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Rooms'
     },
     body:{
         type: String,

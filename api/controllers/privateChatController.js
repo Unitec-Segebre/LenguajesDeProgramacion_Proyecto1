@@ -65,7 +65,7 @@ exports.create_private_chat = function (req, res, next) { //must edit this to ma
                         res.send({ success: false, message: "Private chat couldn't be stored in the user's privatechats." });
                         return next();
                     }
-                    User.findOne({_id: req.body.recipient}, function (err, otherUser) {
+                    User.findOne({ _id: req.body.recipient }, function (err, otherUser) {
                         if (err) {
                             res.send({ success: false, message: "Recipient couldn't be found!" });
                             return next();
@@ -95,99 +95,94 @@ exports.create_private_chat = function (req, res, next) { //must edit this to ma
     });
 }
 
-exports.send_reply = function(req, res, next){
+exports.send_reply = function (req, res, next) {
 
-    if(!req.body.text){
+    if (!req.body.text) {
         res.send({ success: false, message: "Please write a message!" });
         return next();
     }
 
-    if(!req.body.userId){
+    if (!req.body.userId) {
         res.send({ success: false, message: "Backend must provide userId" });
         return next();
     }
 
-    if(!req.body.chatId){
-        res.send({ success: false, message: "Backend must provide chatId" });
-        return next();
-    }
-
     var reply = new Message({
-        chatId: req.body.chatId,
+        chatId: req.params._id,
         body: req.body.text,
         author: req.body.userId
     });
 
-    PrivateChat.findOneAndUpdate({_id: req.params._id}, 
-        { $push: { "messages": reply } }, { returnOriginal: false }, function(err, pchat){
-            if(err){
-                res.send({success: false, message: "Private chat couldn't be found!"});
+    PrivateChat.findOneAndUpdate({ _id: req.params._id },
+        { $push: { "messages": reply } }, { returnOriginal: false }, function (err, pchat) {
+            if (err) {
+                res.send({ success: false, message: "Private chat couldn't be found!" });
                 return next();
             }
-            reply.save(function(err){
-                if(err){
-                    res.send({success: false, message: "Reply couldn't be saved to the database!"});
+            reply.save(function (err) {
+                if (err) {
+                    res.send({ success: false, message: "Reply couldn't be saved to the database!" });
                     return next();
                 }
-                res.send({succes: true, message: "Reply successfully sent!"});
+                res.send({ succes: true, message: "Reply successfully sent!" });
                 return next();
             });
         });
 }
 
-exports.get_specific_chat = function(req, res, next){
-    PrivateChat.findOne({_id: req.params._id}, function(err, pchat){
-        if(err){
-            res.send({success: false, message: "Private chat couldn't be found!"});
+exports.get_specific_chat = function (req, res, next) {
+    PrivateChat.findOne({ _id: req.params._id }, function (err, pchat) {
+        if (err) {
+            res.send({ success: false, message: "Private chat couldn't be found!" });
             return next();
         }
-        Message.find({chatId: req.params._id})
+        Message.find({ chatId: req.params._id })
             .select('createdAt body author')
             .sort('-createdAt')
             .populate({
                 path: 'author',
                 select: 'name'
             })
-            .exec(function(err, messages){
-                if(err){
-                    res.send({success: false, error: err});
+            .exec(function (err, messages) {
+                if (err) {
+                    res.send({ success: false, error: err });
                     return next();
                 }
-                    res.status(200).json({PrivateChat: messages});
+                res.status(200).json({ PrivateChat: messages });
             });
     });
 }
 
-exports.get_chats = function(req, res, next){
-    User.findOne({_id: req.params._id}, function(err, usr){
-        if(err){
-            res.send({succes: false, message: "Current User ID doesn't match any of the registered users."});
+exports.get_chats = function (req, res, next) {
+    User.findOne({ _id: req.params._id }, function (err, usr) {
+        if (err) {
+            res.send({ succes: false, message: "Current User ID doesn't match any of the registered users." });
             return next();
         }
-        PrivateChat.find({participants: req.params._id})
+        PrivateChat.find({ participants: req.params._id })
             .select('_id')
-            .exec(function(err, pchats){
-                if(err){
-                    res.send({success: false, message: "Private chat doesn't exist!" ,error: err});
+            .exec(function (err, pchats) {
+                if (err) {
+                    res.send({ success: false, message: "Private chat doesn't exist!", error: err });
                     return next();
                 }
 
                 let chatList = [];
-                pchats.forEach(function(chat){
-                    Message.find({chatId: chat._id})
+                pchats.forEach(function (chat) {
+                    Message.find({ chatId: chat._id })
                         .sort('-createdAt')
                         .limit(1)
                         .populate({
                             path: 'author',
                             select: 'name'
                         })
-                        .exec(function(err, mssg){
-                            if(err){
-                                res.send({success: false, error: err});
+                        .exec(function (err, mssg) {
+                            if (err) {
+                                res.send({ success: false, error: err });
                                 return next();
                             }
                             chatList.push(mssg);
-                            if(chatList.length === pchats.length) {
+                            if (chatList.length === pchats.length) {
                                 return res.status(200).json({ conversations: chatList });
                             }
                         });
@@ -198,24 +193,24 @@ exports.get_chats = function(req, res, next){
 
 exports.delete_chat = function (req, res, next) { // gotta work on this one
     User.findOne({ _id: req.params._id }, function (err, urs) {
-        if(err){
-            res.send({success: false, message: "Current User ID doesn't exist."});
+        if (err) {
+            res.send({ success: false, message: "Current User ID doesn't exist." });
         }
-        PrivateChat.findOne({_id: req.body.chatId}, function(err, pchat){
-            if(err){
-                res.send({success: false, message: "The private chat you want to delete does not exist."});
+        PrivateChat.findOne({ _id: req.body.chatId }, function (err, pchat) {
+            if (err) {
+                res.send({ success: false, message: "The private chat you want to delete does not exist." });
             }
-            User.update(                                
-            { _id: req.params._id },
-            { $pull: { privateChats: req.body.chatId } }
-            , function (err) {
-                if (err)
-                    return res.send(err);
-                return res.send({
-                success: true,
-                message: "Chat successfully deleted."
-            });
-            });
+            User.update(
+                { _id: req.params._id },
+                { $pull: { privateChats: req.body.chatId } }
+                , function (err) {
+                    if (err)
+                        return res.send(err);
+                    return res.send({
+                        success: true,
+                        message: "Chat successfully deleted."
+                    });
+                });
         });
     });
 }
