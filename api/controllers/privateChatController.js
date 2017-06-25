@@ -159,7 +159,8 @@ exports.get_chats = function (req, res, next) {
             res.send({ succes: false, message: "Current User ID doesn't match any of the registered users." });
             return next();
         }
-        PrivateChat.find({ participants: req.params._id })  //esto debe ser cambiado por un mejor
+        if(typeof usr.privateChats !== 'undefined' && usr.privateChats.length > 0){
+            PrivateChat.find({ participants: req.params._id })  //esto debe ser cambiado por un mejor
             .select('_id')
             .exec(function (err, pchats) {
                 if (err) {
@@ -188,6 +189,9 @@ exports.get_chats = function (req, res, next) {
                         });
                 });
             });
+        }else{
+            res.send({success: false, message: "User doesn't have any private chats!"});
+        }
     });
 }
 
@@ -198,7 +202,7 @@ exports.delete_chat = function (req, res, next) { // gotta work on this one
         }
         User.update({_id: req.params._id},
             { $pull: {privateChats: req.body._id}}, 
-            {returnOriginal: false},
+            { returnOriginal: false},
             function (err) {
                 if(err)
                     return res.send(err);
@@ -209,11 +213,9 @@ exports.delete_chat = function (req, res, next) { // gotta work on this one
                         if (err) {
                             res.send({ success: false, message: "Private chat couldn't be found!" });
                         }
-                        console.log("User1 removed from pchat array");
-                        
+                        console.log("User1 removed from pchat array");             
                 });
-        });
-         
+        });  
     });
 };
 

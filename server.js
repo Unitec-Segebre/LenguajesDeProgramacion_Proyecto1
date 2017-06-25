@@ -13,16 +13,17 @@ var express = require('express'),
     User = require('./api/models/userModel'),
     Room = require('./api/models/roomModel'),
     socketEvents = require('./socketEvents'),
+    expressaValidator = require('express-validator'),
+    expressSession = require('express-session'),
     config = require('./config');
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/Apidb');
 app.set('superSecret', config.secret);
 
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-app.use(morgan('dev'));
 
 var routes = require('./api/routes/apiRoutes');
 routes(app);
@@ -36,3 +37,4 @@ server.listen(port, function(err){
 
 // for testing
 module.exports = server;
+module.exports = io;

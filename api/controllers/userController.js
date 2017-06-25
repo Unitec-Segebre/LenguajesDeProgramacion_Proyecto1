@@ -4,7 +4,7 @@
 var mongoose = require('mongoose'),
     jwt = require('jsonwebtoken'),
     app = require('../../server'),
-    helper = require('./helpers'),
+    //helper = require('./helpers'),
     User = mongoose.model('Users');
 
 exports.list_all_users = function(req, res) {
