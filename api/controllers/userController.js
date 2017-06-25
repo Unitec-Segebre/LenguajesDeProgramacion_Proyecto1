@@ -4,6 +4,7 @@
 var mongoose = require('mongoose'),
     jwt = require('jsonwebtoken'),
     app = require('../../server'),
+    helper = require('./helpers'),
     User = mongoose.model('Users');
 
 exports.list_all_users = function(req, res) {
@@ -23,6 +24,8 @@ exports.create_user = function(req, res) {
         var token = jwt.sign(user, app.get('superSecret'),{
             expiresIn: 60*60*24
         });
+
+       // helper.sendConfirmationEmail(token,req,res);
 
         return res.json({
             success: true,
@@ -117,10 +120,27 @@ exports.add_friend = function (req, res) { //Are friends both sides?
                     });
             })
         }else
-            res.send({"ERR": "Couldnt find user with id", "ID": req.params._id}) //change response
+            res.send({"ERR": "Couldn't find user with id", "ID": req.params._id}) //change response
     })
 };
 
+exports.view_profile = function(req, res){
+    User.findOne({ _id: req.params._id}, function(err, usr){
+        if(err){
+            res.send({success: false, message: "Could not find user."});
+        }
+        res.json(usr);
+    });
+}
+
+exports.search_for_user = function(req, res){
+    User.findOne({username: req.body.username}, function(err, usr){
+        if(err){
+            res.send({success: false, message: "Could not find user."});
+        }
+        res.json(usr);
+    });
+}
 
 exports.list_friends = function (req, res) {
     User.findOne({

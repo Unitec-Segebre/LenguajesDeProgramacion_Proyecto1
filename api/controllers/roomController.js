@@ -7,6 +7,7 @@ Things that could go wrong not specified{
 */
 var mongoose = require('mongoose'),
     User = mongoose.model('Users'),
+    Message = require('../models/messageModel'),
     Room = mongoose.model('Rooms');
 
 
@@ -53,6 +54,14 @@ exports.list_rooms = function (req, res) { //check if user is null
         if(err)
             return res.send(err);
         return res.json(user.rooms);
+    });
+};
+
+exports.list_all_rooms = function (req, res) {
+    Room.find({}, function (err, rm) {
+        if (err)
+            res.send(err);
+        res.json(rm);
     });
 };
 
@@ -130,6 +139,63 @@ exports.list_members = function (req, res) { //check if room is null
             return res.json(room.members)
         })
 };
+
+exports.send_message = function(req, res, next){  //make it so that only room members can send messages
+    if(!req.body.text){
+        res.send({ success: false, message: "Please write a message!" });
+        return next();
+    }
+
+    if(!req.body.userId){
+        res.send({ success: false, message: "Backend must provide userId" });
+        return next();
+    }
+
+    var mssg = new Message({
+        roomId: req.params._id,
+        body: req.body.text,
+        author: req.body.userId
+    });
+
+    Room.findOneAndUpdate({ _id: req.params._id },
+        { $push: { "messages": mssg } }, { returnOriginal: false }, function (err, newroom) {
+            if (err) {
+                res.send({ success: false, message: "Room couldn't be found! Thus messages couldn't be pushed to the messages array" });
+                return next();
+            }
+            mssg.save(function (err) {
+                if (err) {
+                    res.send({ success: false, message: "Message couldn't be saved to the database!" });
+                    return next();
+                }
+                res.send({ succes: true, message: "Reply successfully sent!" });
+                return next();
+            });
+        });
+}
+
+exports.get_specific_room = function(req, res, next){
+     Room.findOne({ _id: req.params._id }, function (err, nroom) {
+        if (err) {
+            res.send({ success: false, message: "Room couldn't be found!" });
+            return next();
+        }
+        Message.find({ roomId: req.params._id })
+            .select('createdAt body author')
+            .sort('-createdAt')
+            .populate({
+                path: 'author',
+                select: 'name'
+            })
+            .exec(function (err, messages) {
+                if (err) {
+                    res.send({ success: false, error: err });
+                    return next();
+                }
+                res.status(200).json({ Room: messages });
+            });
+    });
+}
 
 //Example of nested population
 /*
