@@ -10,7 +10,7 @@ module.exports = function (app) {
     app.route('/login')
         .post(user.login);
 
-    app.route('/users')
+    app.route('/register')
         .post(user.create_user);
 
     //Add specific permisions per token
@@ -37,7 +37,8 @@ module.exports = function (app) {
     });
 
     app.route('/users')
-        .get(user.list_all_users);
+        .get(user.list_all_users)
+        .post(user.search_for_user);
 
     app.route('/users/:_id/profile')
         .get(user.view_profile);

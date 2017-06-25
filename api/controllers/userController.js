@@ -133,6 +133,14 @@ exports.view_profile = function(req, res){
     });
 }
 
+exports.search_for_user = function(req, res){
+    User.findOne({username: req.body.username}, function(err, usr){
+        if(err){
+            res.send({success: false, message: "Could not find user."});
+        }
+        res.json(usr);
+    });
+}
 
 exports.list_friends = function (req, res) {
     User.findOne({
