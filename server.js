@@ -13,9 +13,7 @@ var express = require('express'),
     User = require('./api/models/userModel'),
     Room = require('./api/models/roomModel'),
     socketEvents = require('./socketEvents'),
-    expressaValidator = require('express-validator'),
-    expressSession = require('express-session'),
-    config = require('./config');
+    config = require('./api/controllers/config');
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/Apidb');

@@ -38,6 +38,15 @@ var UserSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    "confirmedEmail":{
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    "temporaryToken":{
+        type: String,
+        required: true
+    },
     "friends": [{
         type:  mongoose.Schema.Types.ObjectId,
         ref: 'Users'
