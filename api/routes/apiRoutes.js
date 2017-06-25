@@ -72,20 +72,9 @@ module.exports = function (app) {
 
     app.route('/users/:_id/privatechats')
         .get(privatechat.get_chats)
-        .post(privatechat.create_private_chat)
-        .delete(privatechat.delete_chat);
+        .post(privatechat.create_private_chat);
     
     app.route('/messages')
         .get(message.list_messages);
-/*
-    app.route('/privatechats')
-        .get(privatechat.get_all_chats);
-    
-    app.route('/privatechats/:_id')
-        .get(privatechat.create_private_chat)
-        .post(privatechat.send_Message);
-    
-    app.route('/new/:_id')
-        .post(privatechat.create_private_chat);*/
 
 };

@@ -15,8 +15,6 @@ var express = require('express'),
     socketEvents = require('./socketEvents'),
     config = require('./config');
 
-app.use(express.static('./index.html'));
-
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/Apidb');
 app.set('superSecret', config.secret);

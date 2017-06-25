@@ -126,11 +126,11 @@ exports.send_reply = function (req, res, next) {
                 }
                 res.send({ succes: true, message: "Reply successfully sent!" });
                 return next();
-            });
         });
+    });
 }
 
-exports.get_specific_chat = function (req, res, next) {
+exports.get_specific_chat = function (req, res, next) { //work on this
     PrivateChat.findOne({ _id: req.params._id }, function (err, pchat) {
         if (err) {
             res.send({ success: false, message: "Private chat couldn't be found!" });
@@ -159,7 +159,7 @@ exports.get_chats = function (req, res, next) {
             res.send({ succes: false, message: "Current User ID doesn't match any of the registered users." });
             return next();
         }
-        PrivateChat.find({ participants: req.params._id })
+        PrivateChat.find({ participants: req.params._id })  //esto debe ser cambiado por un mejor
             .select('_id')
             .exec(function (err, pchats) {
                 if (err) {
@@ -192,25 +192,28 @@ exports.get_chats = function (req, res, next) {
 }
 
 exports.delete_chat = function (req, res, next) { // gotta work on this one
-    User.findOne({ _id: req.params._id }, function (err, urs) {
-        if (err) {
-            res.send({ success: false, message: "Current User ID doesn't exist." });
+    User.findOne({_id: req.params._id}, function(err, usr){
+        if(err){
+            res.json(err);
         }
-        PrivateChat.findOne({ _id: req.body.chatId }, function (err, pchat) {
-            if (err) {
-                res.send({ success: false, message: "The private chat you want to delete does not exist." });
-            }
-            User.update(
-                { _id: req.params._id },
-                { $pull: { privateChats: req.body.chatId } }
-                , function (err) {
-                    if (err)
-                        return res.send(err);
-                    return res.send({
-                        success: true,
-                        message: "Chat successfully deleted."
-                    });
+        User.update({_id: req.params._id},
+            { $pull: {privateChats: req.body._id}}, 
+            {returnOriginal: false},
+            function (err) {
+                if(err)
+                    return res.send(err);
+                res.send({ success: true, message: "Private chat removed from user1 array." });
+
+                PrivateChat.findOneAndUpdate({ _id: req.body._id },
+                    { $pull: { participants: usr._id } }, { returnOriginal: false }, function (err, pchat) {
+                        if (err) {
+                            res.send({ success: false, message: "Private chat couldn't be found!" });
+                        }
+                        console.log("User1 removed from pchat array");
+                        
                 });
         });
+         
     });
-}
+};
+
