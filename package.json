@@ -27,6 +27,7 @@
     "jsonwebtoken": "^7.4.1",
     "mongoose": "^4.10.4",
     "mongoose-unique-validator": "^1.0.5",
-    "nodemailer":"*"
+    "nodemailer": "*",
+    "socket.io": "^2.0.3"
   }
 }

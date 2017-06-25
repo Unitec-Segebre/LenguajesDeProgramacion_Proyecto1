@@ -124,6 +124,15 @@ exports.add_friend = function (req, res) { //Are friends both sides?
     })
 };
 
+exports.view_profile = function(req, res){
+    User.findOne({ _id: req.params._id}, function(err, usr){
+        if(err){
+            res.send({success: false, message: "Could not find user."});
+        }
+        res.json(usr);
+    });
+}
+
 
 exports.list_friends = function (req, res) {
     User.findOne({

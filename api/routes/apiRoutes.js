@@ -39,6 +39,9 @@ module.exports = function (app) {
     app.route('/users')
         .get(user.list_all_users);
 
+    app.route('/users/:_id/profile')
+        .get(user.view_profile);
+
     app.route('/users/:_id/friends')
         .get(user.list_friends)
         .post(user.add_friend);
