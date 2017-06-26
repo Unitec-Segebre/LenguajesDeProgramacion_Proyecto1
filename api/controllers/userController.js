@@ -1,10 +1,13 @@
 'use strict';
 //Format errors
 
-var mongoose = require('mongoose'),
+var bcrypt = require('bcryptjs'),
     jwt = require('jsonwebtoken'),
-    app = require('../../server'),
+    localStrategy = require('passport-local').Strategy,
+    mongoose = require('mongoose'),
     nodemailer = require('nodemailer'),
+    passport = require('passport'),
+    app = require('../../server'),
     sgTransprt = require('nodemailer-sendgrid-transport'),
     config = require('./config'),
     User = mongoose.model('Users');
@@ -27,9 +30,15 @@ exports.list_all_users = function (req, res) {
 exports.create_user = function (req, res) {
     var new_user = new User();
     new_user.username = req.body.username;
-    new_user.password = req.body.password;
     new_user.email = req.body.email;
     new_user.name = req.body.name;
+
+    var bcrypt = require('bcryptjs');
+    bcrypt.genSalt(10, function (err, salt) {
+        bcrypt.hash(req.body.password, salt, function (err, hash) {
+            new_user.password = hash;
+        });
+    });
 
     var token = jwt.sign(new_user, app.get('superSecret'), { expiresIn: 60 * 60 * 24 });
     new_user.temporaryToken = token;
@@ -75,7 +84,7 @@ exports.create_user = function (req, res) {
 };
 
 exports.verify = function (req, res, next) {
-    if(typeof req.query.token != "undefined") {
+    if (typeof req.query.token != "undefined") {
         User.findOne({ temporaryToken: req.query.token }, function (err, usr) {
             if (err) {
                 res.json({ succes: false, error: err });
@@ -86,23 +95,23 @@ exports.verify = function (req, res, next) {
             jwt.verify(token, app.get('superSecret'), function (err, tkn) {
                 if (err) {
                     res.json({ success: false, error: err });
-                }else if(!usr){
-                    res.json({success: false, message: "Wrong token."});
-                }else{
+                } else if (!usr) {
+                    res.json({ success: false, message: "Wrong token." });
+                } else {
                     User.findOneAndUpdate({ temporaryToken: token },
-                    { $set: { confirmedEmail: true } }, { returnOriginal: false }
-                    , function (err) {
-                        if (err)
-                            return res.send(err);
-                        console.log("User has been successfully activated!");
-                    });
+                        { $set: { confirmedEmail: true } }, { returnOriginal: false }
+                        , function (err) {
+                            if (err)
+                                return res.send(err);
+                            console.log("User has been successfully activated!");
+                        });
                 }
             });
         });
     } else {
         console.log("Token is absent.");
         return next();
-    }  
+    }
 
 }
 
@@ -121,44 +130,50 @@ exports.login = function (req, res) {
             });
         } else if (user) {
             if (user.loginAttemptCount >= 5) {
-                //Send Mailer
+                //Send Mailer to reset password
                 return res.json({
                     success: false,
                     message: "Authentication failed: Max attempts reached."
                 });
             } else {
-                if (user.password !== req.body.password) {
-                    user.loginAttemptCount += 1;
-                    user.save(function (err, user) {
-                        if (!err) {
-                            return res.json({
-                                success: false,
-                                message: "Authentication failed: Wrong Password."
-                            });
-                        } else return res.send(err);
-                    });
-                }else if(user.confirmedEmail != true){
-                    return res.json({
-                                success: false,
-                                message: "Authentication failed: Email not confirmed."
-                    });
-                } else {
-                    user.loginAttemptCount = 0;
-                    user.save(function (err, user) {
-                        if (err)
-                            return res.send(err);
-                    });
+                var hash = user.password
+                bcrypt.compare(req.body.password, hash, function (err, resp, done) {
+                    if (err) {
+                        res.json(err);
+                    }
+                    if (resp != true) {
+                        user.loginAttemptCount += 1;
+                        user.save(function (err, user) {
+                            if (!err) {
+                                return res.json({
+                                    success: false,
+                                    message: "Authentication failed: Wrong Password."
+                                });
+                            } else return res.send(err);
+                        });
+                    } else if (user.confirmedEmail != true) {
+                        res.json({
+                            success: false,
+                            message: "Authentication failed: Email not confirmed."
+                        });
+                    } else {
+                        user.loginAttemptCount = 0;
+                        user.save(function (err, user) {
+                            if (err)
+                                return res.send(err);
+                        });
 
-                    var token = jwt.sign(user, app.get('superSecret'), {
-                        expiresIn: 60 * 60 * 24
-                    });
+                        var token = jwt.sign(user, app.get('superSecret'), {
+                            expiresIn: 60 * 60 * 24
+                        });
 
-                    return res.json({
-                        success: true,
-                        message: "You have successfully logged in!",
-                        token: token
-                    });
-                }
+                        return res.json({
+                            success: true,
+                            message: "You have successfully logged in!",
+                            token: token
+                        });
+                    }
+                });
             }
         }
     });
