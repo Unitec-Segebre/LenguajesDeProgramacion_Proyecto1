@@ -3,14 +3,13 @@
 
 var bcrypt = require('bcryptjs'),
     jwt = require('jsonwebtoken'),
-    localStrategy = require('passport-local').Strategy,
     mongoose = require('mongoose'),
     nodemailer = require('nodemailer'),
-    passport = require('passport'),
     app = require('../../server'),
     sgTransprt = require('nodemailer-sendgrid-transport'),
     config = require('./config'),
     User = mongoose.model('Users');
+
 
 var options = {
     auth: {
@@ -164,9 +163,10 @@ exports.login = function (req, res) {
                         });
 
                         var token = jwt.sign(user, app.get('superSecret'), {
-                            expiresIn: 60 * 60 * 24
+                            expiresIn: 60 * 60 * 48
                         });
-
+                        req.session.user = user;
+                        req.session.user.temporaryToken = token;
                         return res.json({
                             success: true,
                             message: "You have successfully logged in!",
@@ -178,6 +178,13 @@ exports.login = function (req, res) {
         }
     });
 };
+
+exports.persistence = function(req, res){
+    if(!req.session.user){
+        return res.status(401).send();
+    }
+    return res.status(200).send("done")
+}
 
 exports.add_friend = function (req, res) { //Are friends both sides?
     User.findOne({
