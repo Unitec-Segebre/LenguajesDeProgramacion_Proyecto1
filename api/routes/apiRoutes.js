@@ -13,10 +13,10 @@ module.exports = function (app) {
     app.route('/register')
         .post(user.create_user);
 
-
+    
     //Add specific permisions per token
     app.use(function (req, res, next) {
-        var token = req.body.token || req.query.token || req.headers['chat-access-token'];
+        var token = req.body.token || req.query.token || req.headers['chat-access-token'] || req.session.user.temporaryToken;
         //console.log(JSON.stringify(req.headers));
         if (token) {
             jwt.verify(token, app.get('superSecret'), function (err, decoded) {
@@ -36,6 +36,8 @@ module.exports = function (app) {
                 message: "No token provided!"
             });
     });
+    app.route('/dashboard')
+        .get(user.persistence);
 
     app.route('/verify')
         .get(user.verify);

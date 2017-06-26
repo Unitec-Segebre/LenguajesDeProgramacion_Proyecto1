@@ -1,12 +1,12 @@
-//Scan project to replace var with let and delete unused variables
-//Add bcrypt from: http://blog.slatepeak.com/refactoring-a-basic-authenticated-api-with-node-express-and-mongo/
 var express = require('express'),
     app = module.exports = express(),
     port = process.env.PORT || 3000,
     mongoose = require('mongoose'),
     morgan = require('morgan'),
     jwt = require('jsonwebtoken'),
+    cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
+    expressSession = require('express-session'),
     socket = require('socket.io'),
     server = require('http').createServer(app),
     io = require('socket.io')(server),
@@ -15,24 +15,37 @@ var express = require('express'),
     socketEvents = require('./socketEvents'),
     config = require('./api/controllers/config');
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/Apidb');
-app.set('superSecret', config.secret);
 
-app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+mongoose.Promise = global.Promise;
+mongoose.connect(config.dburl);
 
 var routes = require('./api/routes/apiRoutes');
-routes(app);
 
+app.set('superSecret', config.secret);
+
+//middleware
+app.use(morgan('dev'));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(expressSession({
+    secret: config.secret,
+    saveUninitialized: true,
+    resave: false
+}));
+
+//Global variables
+app.use(function(req, res, next){
+    res.locals.user = req.user || null;
+    next();
+});
+
+routes(app);
+//setting port
 server.listen(port, function(err){
     if(err){
         console.log("Couldn't connecto to port: " + port);
     }
     console.log('OVERCHAT API server started on: ' + port);
 });
-
-// for testing
-module.exports = server;
-module.exports = io;

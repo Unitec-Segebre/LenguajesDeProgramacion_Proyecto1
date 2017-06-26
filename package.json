@@ -22,15 +22,21 @@
     "morgan": "^1.8.2"
   },
   "dependencies": {
+    "bcryptjs": "*",
     "body-parser": "^1.17.2",
+    "cookie-parser": "*",
     "express": "^4.15.3",
     "express-session": "^1.15.3",
     "express-validator": "^3.2.0",
     "jsonwebtoken": "^7.4.1",
+    "mongodb": "^2.2.29",
     "mongoose": "^4.10.4",
     "mongoose-unique-validator": "^1.0.5",
     "nodemailer": "*",
     "nodemailer-sendgrid-transport": "^0.2.0",
+    "passport": "^0.3.2",
+    "passport-http": "*",
+    "passport-local": "*",
     "socket.io": "^2.0.3"
   }
 }
