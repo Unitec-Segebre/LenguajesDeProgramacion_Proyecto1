@@ -167,6 +167,7 @@ exports.login = function (req, res) {
                         });
                         req.session.user = user;
                         req.session.user.temporaryToken = token;
+                        
                         return res.json({
                             success: true,
                             message: "You have successfully logged in!",
@@ -183,7 +184,12 @@ exports.persistence = function(req, res){
     if(!req.session.user){
         return res.status(401).send();
     }
-    return res.status(200).send("done")
+    return res.status(200).send("Logged in.");
+}
+
+exports.logout = function(req,res){
+    req.session.user = null;
+    return res.send("User has logged out");
 }
 
 exports.add_friend = function (req, res) { //Are friends both sides?

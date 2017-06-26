@@ -6,6 +6,7 @@ Things that could go wrong not specified{
 }
 */
 var mongoose = require('mongoose'),
+    sessions = require('express-session'),
     User = mongoose.model('Users'),
     Message = require('../models/messageModel'),
     Room = mongoose.model('Rooms');
@@ -66,66 +67,88 @@ exports.list_all_rooms = function (req, res) {
 };
 
 exports.remove_member = function (req, res) { //Validacion de ser el dueño en frontend? Osea no dar opcion a menos que sea el dueño
-    User.update(                                //Actualmente no revisa si existe el usuario o el room
-        {_id: req.body._id},
-        {$pull: {rooms: req.params._id}}
-        ,function (err) {
-            if(err)
-                return res.send(err);
+    Room.findOne({_id: req.params._id}, function(err, room){
+        if(err){
+            console.log("Room not found!!");
+            res.json(err);
+        }
+        if(req.session.user._id != room.owner){
+            console.log("User is not owner; cannot remove members.");
+            return res.send({success: false});
+        }else{
+            User.findOne({_id: req.body._id}, function(err, usr){
+                if(err){
+                    res.json(err);
+                }
+                User.update(                                
+                {_id: req.body._id},
+                {$pull: {rooms: req.params._id}}
+                ,function (err) {
+                    if(err)
+                        return res.send(err);
+                });
+                Room.update(
+                    {_id: req.params._id},
+                    {$pull: {members: req.body._id}}
+                    ,function (err) {
+                        if(err)
+                            return res.send(err);
+                });
+                return res.send({
+                    success: true,
+                    message: "User removed from chat."
+                })
+            });
+        }
     });
-    Room.update(
-        {_id: req.params._id},
-        {$pull: {members: req.body._id}}
-        ,function (err) {
-            if(err)
-                return res.send(err);
-    });
-    return res.send({
-        success: true,
-        message: "User removed from chat."
-    })
 };
 
 exports.add_member = function (req, res) { //Validacion de ser el dueño en frontend? Osea no dar opcion a menos que sea el dueño
     Room.findOne({
         _id: req.params._id
     }, function (err, room) {
-        if(err)
+        if(err){
             return res.send(err);
-        if(room) {
-            User.findOne({
-                _id: req.body._id
-            }, function (err, member) {
-                if (err)
-                    return res.send(err);
+        }
+        if(req.session.user._id != room.owner){
+            res.send("User is not owner of the room.");
+        }else{
+            if(room) {
+                User.findOne({
+                    _id: req.body._id
+                }, function (err, member) {
+                    if (err)
+                        return res.send(err);
 
-                if(member) {
-                    room.members.push(member);
-                    room.save(function (err) {
-                        if (err)
-                            return res.send(err);
-
-                        member.rooms.push(room);
-                        member.save(function (err) {
-                            if(err)
+                    if(member) {
+                        room.members.push(member);
+                        room.save(function (err) {
+                            if (err)
                                 return res.send(err);
 
-                            return res.json({
-                                success: true,
-                                message: "Member added succesfully."
+                            member.rooms.push(room);
+                            member.save(function (err) {
+                                if(err)
+                                    return res.send(err);
+
+                                return res.json({
+                                    success: true,
+                                    message: "Member added succesfully."
+                                });
                             });
                         });
-                    });
-                }else
-                    return res.json({
-                        success: false,
-                        id: req.body._id,
-                        message: "User does not exist."
-                    });
-            })
-        }else
-            res.send({"ERR": "Couldnt find room with id", "ID": req.params._id}) //change response
-    })
+                    }else
+                        return res.json({
+                            success: false,
+                            id: req.body._id,
+                            message: "User does not exist."
+                        });
+                })
+            }else{
+                res.send({"ERR": "Couldnt find room with id", "ID": req.params._id}) //change response
+            }
+        }
+    });
 };
 
 exports.list_members = function (req, res) { //check if room is null
