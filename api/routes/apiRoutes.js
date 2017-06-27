@@ -36,8 +36,8 @@ module.exports = function (app) {
                 message: "No token provided!"
             });
     });
-    app.route('/dashboard')
-        .get(user.persistence);
+    app.route('/logout')
+        .get(user.logout);
 
     app.route('/verify')
         .get(user.verify);
